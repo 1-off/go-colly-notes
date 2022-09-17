@@ -1,6 +1,5 @@
 # go-colly-notes
 
-
 ## basic colly scrap 
 - The OnHTML event can be used to take action when a specific HTML element is found. OnHTML is a powerful tool. It can search for CSS selectors (i.e. div.my_fancy_class or #someElementId)
 - The OnRequest event is raised when an HTTP request is sent to a URL. This event is used to track which URL is being visited.
@@ -10,7 +9,18 @@
 ```go
     c.OnHTML("#myCoolSection", func(e *colly.HTMLElement) {
     fmt.Println(e.ChildText("p"))})
+    
+  
 ```
+  - And we can use ForEach() to iterate over an elements children that match a specific selector
+  ```go
+   c.OnHTML("#myCoolSection", func(e *colly.HTMLElement) {
+    e.ForEach("p", func(_ int, elem *colly.HTMLElement) {
+        if strings.Contains(elem.Text, "golang") {
+            fmt.Println(elem.Text)
+        }    
+    })})
+  ```
 Example:
 ```go
 package main
@@ -73,4 +83,29 @@ book := Book{}
 ## References
 - https://www.scrapingbee.com/blog/web-scraping-go/
 - https://go-colly.org/
+
+## htmlquery 
+htmlquery is an XPath query package for HTML, lets you extract data or evaluate from HTML documents by an XPath expression.
+```go
+package main
+
+import (
+    "fmt"
+
+    "github.com/PuerkitoBio/goquery"
+)
+
+func main() {
+    doc, err := goquery.NewDocument(url)
+    if err != nil {
+        panic(err)
+    }
+    s := doc.Find(`html > head > meta[name="viewport"]`)
+    if s.Length() == 0 {
+        fmt.Println("could not find viewpoint")
+        return
+    }
+    fmt.Println(s.Eq(0).AttrOr("content", ""))
+```
+- https://github.com/antchfx/htmlquery
 
