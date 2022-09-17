@@ -2,9 +2,16 @@
 
 
 ## basic colly scrap 
-- The OnHTML event can be used to take action when a specific HTML element is found.
+- The OnHTML event can be used to take action when a specific HTML element is found. OnHTML is a powerful tool. It can search for CSS selectors (i.e. div.my_fancy_class or #someElementId)
 - The OnRequest event is raised when an HTTP request is sent to a URL. This event is used to track which URL is being visited.
 - OnResponse can be used to examine the response. 
+- Attr() method and Text property that colly.HTMLElement has, we can also use it to traverse child elements. The ChildAttr(), ChildText(), and ForEach() methods
+  - ChildText() to get the text of all the paragraphs in a section
+```go
+    c.OnHTML("#myCoolSection", func(e *colly.HTMLElement) {
+    fmt.Println(e.ChildText("p"))})
+```
+Example:
 ```go
 package main
 
@@ -14,13 +21,19 @@ import (
 
 func main(url string) {
 unc search(item string) {
-	c := colly.NewCollector()
+	c := colly.NewCollector(
+  // Allow visiting the same page multiple times
+    colly.AllowURLRevisit(),
+    // Allow crawling to be done in parallel / async
+    colly.Async(true),
+
+)
 
 	// Find and visit all links
-	c.OnHTML("a", func(e *colly.HTMLElement) {
-  	
-    fmt.Println(e.Attr("href"))
-		err := e.Request.Visit(e.Attr("href"))
+	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
+  	link := e.Attr("href")
+    fmt.Println(link)
+		err := e.Request.AbsoluteURL(link))
 		if err != nil {
 			return
 		}
